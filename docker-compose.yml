@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  laravel-api-base:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel-api-base
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_DATABASE=laravel
+      - DB_USERNAME=root
+      - DB_PASSWORD=secret
+    networks:
+      - laravel_network
+
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: laravel
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - laravel_network
+    ports:
+      - "5432:5432"
+
+volumes:
+  db-data:
+
+networks:
+  laravel_network:
+    driver: bridge
